@@ -6,9 +6,11 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
-func getToken(code string) (err error) {
+func getToken(ctx *gin.Context, code string) (err error) {
 
 	log.Println("get token request")
 
@@ -18,14 +20,16 @@ func getToken(code string) (err error) {
 	if err != nil {
 		return err
 	}
-	if response.StatusCode != http.StatusOK {
-		return fmt.Errorf("response error code:%v", response.StatusCode)
-	}
 	respBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return err
 	}
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("response error code:%v\nresponse body:%v", response.StatusCode, respBody)
+	}
 	fmt.Println("get token resp:", string(respBody))
+	tokenResponse = string(respBody)
+	// ctx.Redirect(http.StatusFound, "localhost:5000/display")
 	return nil
 }
 

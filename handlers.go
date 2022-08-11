@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +15,7 @@ func redirectHandler(ctx *gin.Context) {
 }
 
 func code(ctx *gin.Context) {
+
 	log.Println("code callback server is being requested.")
 
 	errMsg, errExist := ctx.GetQuery("error")
@@ -27,8 +29,18 @@ func code(ctx *gin.Context) {
 	}
 	log.Printf("code: %v", code)
 
-	err := getToken(fmt.Sprintf("%v", code))
+	err := getToken(ctx, fmt.Sprintf("%v", code))
 	if err != nil {
 		log.Fatalln("get token err: ", err)
 	}
+
+	time.Sleep(2000)
+
+	if tokenResponse != "" {
+		ctx.Redirect(302, "http://localhost:5000/display")
+	}
+}
+
+func display(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, tokenResponse)
 }
